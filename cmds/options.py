@@ -80,14 +80,14 @@ def filter_stale_quotes(opt_chain):
     
     return mask
 
-def clean_options(calls_raw,puts_raw):
+def clean_options(calls_raw,puts_raw,volume_threshold_quantile=.5):
     idx = filter_stale_quotes(calls_raw)
     calls = calls_raw.loc[idx,:]
     idx = filter_stale_quotes(puts_raw)
     puts = puts_raw.loc[idx,:]
 
-    calls = calls[calls['volume'] > calls['volume'].quantile(.75)].set_index('contractSymbol')
-    puts = puts[puts['volume'] > puts['volume'].quantile(.75)].set_index('contractSymbol')
+    calls = calls[calls['volume'] > calls['volume'].quantile(volume_threshold_quantile)].set_index('contractSymbol')
+    puts = puts[puts['volume'] > puts['volume'].quantile(volume_threshold_quantile)].set_index('contractSymbol')
     
     calls['lastTradeDate'] = calls['lastTradeDate'].dt.tz_localize(None)
     puts['lastTradeDate'] = puts['lastTradeDate'].dt.tz_localize(None)
